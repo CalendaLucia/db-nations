@@ -1,6 +1,7 @@
 package org.learning.database.nations;
 
 import java.sql.*;
+import java.util.Scanner;
 
 import static java.sql.DriverManager.getConnection;
 
@@ -12,7 +13,10 @@ public class Main {
         String user = "root";
         String password = "root";
 
-
+        //CHIEDI ALL'UTENTE DI INSERIRE LA STRINGA DI RICERCA
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Ricerca per nome: ");
+        String searchString = scanner.nextLine();
 
         //provo ad aprire una connessione al database
         try(Connection connection = DriverManager.getConnection(url,user,password)) {
@@ -20,26 +24,24 @@ public class Main {
             connection.getCatalog();
             //preparo lo statment sql da eseguire
             String sql = """
-                SELECT countries.name AS Nome, `country_id` AS ID, regions.name AS Regione, continents.name AS Continente 
-                FROM `countries` JOIN regions ON country_id = regions.region_id 
-                JOIN continents ON country_id = continents.continent_id 
+                SELECT countries.name AS Nome, countries.country_id AS ID, regions.name AS Regione, continents.name AS Continente 
+                FROM countries 
+                JOIN regions ON countries.region_id = regions.region_id 
+                JOIN continents ON regions.continent_id = continents.continent_id 
+                WHERE countries.name LIKE ?
                 ORDER BY Nome ASC;
             """;
 
             //chiedo alla connection di preparare lo statement
             try(PreparedStatement ps = connection.prepareStatement(sql)){
+                //imposta il parametro di ricerca
+                ps.setString(1, "%" + searchString + "%");
+
                 //eseguo lo statmnet che restituisce un resultSet
-
-                //sql injection per proteggere dal codice malevolo  si fa prima della executeQuery
-                //inserire i punti interrogativi nelle query dove si richiedere un paramentro dall utente
-                // ps.setInt(1, paramentro1input);
-                // ps.setString(2, paramentro2input);
-
                 try (ResultSet rs = ps.executeQuery()) {
-                    //itero sulle righe del resultSet
+                    //itero sulle righe del ResultSet
                     while (rs.next()){
                         //per ogni riga prendo i valori dalle singole colonne.
-
                         String name = rs.getString("nome");
                         String id= rs.getString("id");
                         String regione = rs.getString("regione");
