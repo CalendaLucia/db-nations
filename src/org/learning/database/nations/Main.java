@@ -38,7 +38,7 @@ public class Main {
                 try (ResultSet rs = ps.executeQuery()) {
                     //itero sulle righe del resultSet
                     while (rs.next()){
-                        //per ogni riga prendo i valori dalle singole colonne
+                        //per ogni riga prendo i valori dalle singole colonne.
 
                         String name = rs.getString("nome");
                         String id= rs.getString("id");
